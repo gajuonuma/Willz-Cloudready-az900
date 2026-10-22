@@ -3,6 +3,7 @@
 
 const STORAGE_KEY = "cloudready-az900-progress";
 const PLANNER_KEY = "cloudready-az900-planner";
+const QUESTION_HISTORY_KEY = "cloudready-az900-question-history";
 
 const TOPICS = {
     cloud: "Cloud concepts",
@@ -162,6 +163,76 @@ function shuffle(items) {
     return result;
 }
 
+
+function getQuizQuestionId(question) {
+    if (question.id !== undefined && question.id !== null) {
+        return String(question.id);
+    }
+
+    return getQuestionText(question);
+}
+
+function readQuestionHistory() {
+    try {
+        const saved = JSON.parse(
+            localStorage.getItem(QUESTION_HISTORY_KEY)
+        );
+
+        return saved && typeof saved === "object" && !Array.isArray(saved)
+            ? saved
+            : {};
+    } catch (error) {
+        console.warn("Could not read question history:", error);
+        return {};
+    }
+}
+
+function selectQuizQuestions(available, count, poolKey) {
+    const history = readQuestionHistory();
+    const availableIds = new Set(available.map(getQuizQuestionId));
+
+    let seen = Array.isArray(history[poolKey])
+        ? history[poolKey].map(String).filter(id => availableIds.has(id))
+        : [];
+
+    let unseen = available.filter(
+        question => !seen.includes(getQuizQuestionId(question))
+    );
+
+    if (unseen.length === 0) {
+        seen = [];
+        unseen = available.slice();
+    }
+
+    const selected = shuffle(unseen).slice(0, count);
+    const remaining = count - selected.length;
+
+    if (remaining > 0) {
+        const previouslySeen = shuffle(
+            available.filter(question =>
+                seen.includes(getQuizQuestionId(question))
+            )
+        );
+
+        selected.push(...previouslySeen.slice(0, remaining));
+    }
+
+    history[poolKey] = [
+        ...new Set([...seen, ...selected.map(getQuizQuestionId)])
+    ];
+
+    try {
+        localStorage.setItem(
+            QUESTION_HISTORY_KEY,
+            JSON.stringify(history)
+        );
+    } catch (error) {
+        console.warn("Could not save question history:", error);
+    }
+
+    return selected;
+}
+
 function startQuiz() {
     if (!Array.isArray(QUESTIONS) || QUESTIONS.length === 0) {
         $("#quiz-status").textContent =
@@ -187,7 +258,7 @@ function startQuiz() {
         available.length
     );
 
-    quizQuestions = shuffle(available).slice(0, count);
+    quizQuestions = selectQuizQuestions(available, count, chosenTopic);
     currentQuestionIndex = 0;
     selectedAnswerIndex = null;
     answerHistory = [];
@@ -451,6 +522,7 @@ $("#reset-progress").addEventListener("click", () => {
 
     try {
         localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(QUESTION_HISTORY_KEY);
         renderDashboard();
         $("#quiz-status").textContent = "Saved quiz progress has been reset.";
     } catch (error) {
