@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Practise Azure Fundamentals with original questions, explanations, flashcards and study planning.">
+    <title>CloudReady AZ-900</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="questions.js" defer></script>
+    <script src="flashcards.js" defer></script>
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="#dashboard" aria-label="CloudReady AZ-900 home">
+            <span class="brand-mark">CR</span>
+            <span>
+                <strong>Willz CloudReady</strong>
+                <small>AZ-900 Fundamentals</small>
+            </span>
+        </a>
+        <span class="unofficial-label">Independent learning tool</span>
+    </header>
+
+    <main class="app-shell">
+        <section class="welcome">
+            <p class="eyebrow">YOUR LEARNING WORKSPACE</p>
+            <h1>Build your Azure confidence.</h1>
+            <p>Practise concepts, understand your mistakes, and plan your next revision session.</p>
+        </section>
+
+        <nav class="main-nav" aria-label="Main navigation">
+            <button class="nav-button active" data-view="dashboard" type="button">Dashboard</button>
+            <button class="nav-button" data-view="quiz" type="button">Practice quiz</button>
+            <button class="nav-button" data-view="flashcards" type="button">Flashcards</button>
+            <button class="nav-button" data-view="planner" type="button">Study planner</button>
+            <button class="nav-button" data-view="buddy" type="button">Study buddy</button>
+        </nav>
+
+        <section id="dashboard" class="view">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">OVERVIEW</p>
+                    <h2>Your progress</h2>
+                </div>
+                <button id="reset-progress" class="button button-secondary" type="button">
+                    Reset progress
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <article class="stat-card">
+                    <span>Questions answered</span>
+                    <strong id="total-answered">0</strong>
+                </article>
+                <article class="stat-card">
+                    <span>Overall accuracy</span>
+                    <strong id="overall-accuracy">0%</strong>
+                </article>
+                <article class="stat-card">
+                    <span>Topics to review</span>
+                    <strong id="weak-topic-count">0</strong>
+                </article>
+            </div>
+
+            <section class="panel">
+                <h3>Topic performance</h3>
+                <p class="muted">Your results will appear here as you practise.</p>
+                <div id="topic-progress"></div>
+            </section>
+
+            <section class="panel">
+                <h3>Recommended next step</h3>
+                <p id="next-recommendation">Start a practice quiz to discover which topics you should review.</p>
+                <button class="button" data-go="quiz" type="button">Start practising</button>
+            </section>
+        </section>
+
+        <section id="quiz" class="view" hidden>
+            <p class="eyebrow">PRACTICE AND LEARN</p>
+            <h2>Practice quiz</h2>
+
+            <div class="panel">
+                <label for="quiz-topic">Choose a topic</label>
+                <select id="quiz-topic">
+                    <option value="all">All exam domains</option>
+                    <option value="cloud">Cloud concepts</option>
+                    <option value="architecture">Azure architecture and services</option>
+                    <option value="governance">Azure management and governance</option>
+                </select>
+
+                <label for="quiz-length">Questions in this session</label>
+                <select id="quiz-length">
+                    <option value="5">5 questions</option>
+                    <option value="10">10 questions</option>
+                    <option value="20">20 questions</option>
+                </select>
+
+                <button id="start-quiz" class="button" type="button">Start quiz</button>
+                <p id="quiz-status" class="status-message" aria-live="polite">Choose your options to begin.</p>
+            </div>
+
+            <div id="quiz-area" class="panel" hidden>
+                <p id="question-progress" class="eyebrow"></p>
+                <h3 id="question-text"></h3>
+                <div id="answer-options" class="answer-options"></div>
+                <div id="answer-feedback" aria-live="polite"></div>
+                <button id="next-question" class="button" type="button" hidden>Next question</button>
+            </div>
+
+            <div id="quiz-results" class="panel" hidden>
+                <h3>Session complete</h3>
+                <p id="quiz-score"></p>
+                <div id="quiz-review"></div>
+                <button id="retry-quiz" class="button" type="button">Practise again</button>
+            </div>
+        </section>
+
+        <section id="flashcards" class="view" hidden>
+            <p class="eyebrow">REVISE KEY CONCEPTS</p>
+            <h2>Flashcards</h2>
+            <p class="muted">Test your recall before revealing the explanation.</p>
+
+            <div class="flashcard panel">
+                <p id="flashcard-count" class="eyebrow">Card 0 of 0</p>
+                <h3 id="flashcard-front">Your flashcards will appear here.</h3>
+                <p id="flashcard-back" hidden></p>
+                <div class="button-row">
+                    <button id="reveal-flashcard" class="button" type="button">Reveal answer</button>
+                    <button id="previous-flashcard" class="button button-secondary" type="button">Previous</button>
+                    <button id="next-flashcard" class="button button-secondary" type="button">Next</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="planner" class="view" hidden>
+            <p class="eyebrow">STUDY WITH A PLAN</p>
+            <h2>Personal study planner</h2>
+
+            <form id="planner-form" class="panel">
+                <label for="exam-date">Target exam date</label>
+                <input id="exam-date" type="date" required>
+
+                <label for="study-hours">Hours available per week</label>
+                <input id="study-hours" type="number" min="1" max="40" value="5" required>
+
+                <label for="study-weak-topic">Topic you find most difficult</label>
+                <select id="study-weak-topic">
+                    <option value="cloud">Cloud concepts</option>
+                    <option value="architecture">Azure architecture and services</option>
+                    <option value="governance">Azure management and governance</option>
+                </select>
+
+                <button class="button" type="submit">Create my plan</button>
+            </form>
+
+            <div id="planner-result" class="panel" aria-live="polite">
+                Your personalised study plan will appear here.
+            </div>
+        </section>
+
+        <section id="buddy" class="view" hidden>
+            <p class="eyebrow">CONCEPTS MADE SIMPLER</p>
+            <h2>Your study buddy</h2>
+            <p class="muted">Ask a question about an Azure Fundamentals concept. This version uses a built-in learning guide, not a live AI service.</p>
+
+            <form id="buddy-form" class="panel">
+                <label for="buddy-question">What would you like explained?</label>
+                <textarea id="buddy-question" rows="3" placeholder="For example: What is an Azure region?" required></textarea>
+                <button class="button" type="submit">Explain concept</button>
+            </form>
+
+            <div id="buddy-response" class="panel" aria-live="polite">
+                Try asking about cloud computing, regions, availability zones, virtual machines, resource groups, or shared responsibility.
+            </div>
+        </section>
+
+        <footer class="site-footer">
+            <p>CloudReady AZ-900 is an unofficial learning tool and is not affiliated with or endorsed by Microsoft.</p>
+            <p>Practice results are for learning purposes and do not guarantee exam readiness.</p>
+        </footer>
+    </main>
+</body>
+</html>
